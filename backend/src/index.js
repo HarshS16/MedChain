@@ -29,12 +29,12 @@ const PORT = process.env.PORT || 3001;
 // Security headers
 app.use(helmet());
 
-// CORS
+// CORS Configuration
 app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    origin: '*', // Allow all origins (Web, Mobile, etc.) in development
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
 // Compression

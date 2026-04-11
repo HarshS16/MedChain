@@ -121,16 +121,19 @@ router.get('/audit/:patientId', async (req, res, next) => {
  */
 router.get('/my-grants', async (req, res, next) => {
     try {
-        const grants = [];
-
-        for (const [key, grant] of accessGrants.entries()) {
-            if (key.startsWith('GRANT-') && grant.isActive) {
-                if (req.user.role === 'patient' && grant.patientId === req.user.id) {
-                    grants.push(grant);
-                } else if (req.user.role === 'doctor' && grant.grantedTo === req.user.id) {
-                    grants.push(grant);
-                }
-            }
+        const { prisma } = require('../config/db');
+        
+        let grants;
+        if (req.user.role === 'patient') {
+            grants = await prisma.accessGrant.findMany({
+                where: { patientId: req.user.id, isActive: true }
+            });
+        } else if (req.user.role === 'doctor') {
+            grants = await prisma.accessGrant.findMany({
+                where: { grantedTo: req.user.id, isActive: true }
+            });
+        } else {
+            grants = [];
         }
 
         res.json({
@@ -143,3 +146,4 @@ router.get('/my-grants', async (req, res, next) => {
 });
 
 module.exports = router;
+

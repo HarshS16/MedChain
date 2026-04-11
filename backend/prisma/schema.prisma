@@ -73,6 +73,7 @@ model RecordCache {
   medicalCategory String[]  @map("medical_category")
   dataHash        String    @map("data_hash")
   ipfsCid         String    @map("ipfs_cid")
+  extractedText   String?   @map("extracted_text")
   tags            String[]
   blockchainTxId  String?   @map("blockchain_tx_id")
   recordedAt      DateTime  @map("recorded_at")
@@ -87,6 +88,7 @@ model RecordCache {
   @@index([recordedAt])
   @@map("record_cache")
 }
+
 
 model Session {
   id          String    @id @default(uuid()) @db.Uuid

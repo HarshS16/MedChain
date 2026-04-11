@@ -56,26 +56,80 @@ router.post('/upload-document', requireRole('patient', 'doctor', 'admin'), uploa
         }
 
         // 0. Safety: Find the actual patient to prevent foreign key errors
-        let targetPatient = await prisma.patient.findFirst({
-            where: {
-                OR: [
-                    { patientId: patientId },
-                    { id: patientId }
-                ]
-            }
+        let targetPatient = await prisma.patient.findUnique({
+            where: { patientId: patientId }
         });
 
+        // If not found by custom ID, and it looks like a UUID, try searching by UUID
+        if (!targetPatient && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(patientId)) {
+            targetPatient = await prisma.patient.findUnique({
+                where: { id: patientId }
+            });
+        }
+
         if (!targetPatient) {
-            return res.status(404).json({ error: 'Patient not found', message: 'The provided patient ID does not exist in our records.' });
+            return res.status(404).json({ 
+                error: 'Patient not found', 
+                message: `The provided patient ID (${patientId}) does not exist in our database.` 
+            });
         }
 
         const actualPatientId = targetPatient.patientId;
 
-        // 1. Upload to IPFS immediately
+        // 1. Upload to IPFS
         const ipfsCid = await ipfsService.storeData(file.buffer);
         const recordId = `REC-DOC-${Date.now()}`;
 
-        // 2. Save to Database
+        // 2. Extract text / prepare compressed image for AI vision
+        let extractedText = '';
+        try {
+            const sharp = require('sharp');
+
+            if (file.mimetype === 'application/pdf') {
+                const pdfParse = require('pdf-parse');
+                const pdfData = await pdfParse(file.buffer);
+                const text = (pdfData.text || '').trim();
+                
+                if (text.length > 50) {
+                    // Good text extraction — text-based PDF
+                    extractedText = text;
+                    logger.info(`📄 PDF text extracted: ${text.length} chars for ${recordId}`);
+                } else {
+                    // Scanned PDF — can't extract text, store note for user
+                    extractedText = '[Scanned PDF: No machine-readable text. For best AI analysis, please upload an image of the report or a text-based PDF.]';
+                    logger.info(`📄 Scanned PDF detected for ${recordId}, no text available`);
+                }
+            } else if (file.mimetype.startsWith('image/')) {
+                // Compress image to a small JPEG for vision AI (max 800px wide, 60% quality)
+                const compressed = await sharp(file.buffer)
+                    .resize(800, null, { withoutEnlargement: true })
+                    .jpeg({ quality: 60 })
+                    .toBuffer();
+                
+                const base64 = compressed.toString('base64');
+                extractedText = `VISION:image/jpeg:${base64}`;
+                const sizeMB = (compressed.length / 1024 / 1024).toFixed(2);
+                logger.info(`🖼️ Image compressed (${sizeMB}MB) and stored for vision AI: ${file.originalname}`);
+            } else {
+                extractedText = `[Unsupported file type: ${file.mimetype}]`;
+            }
+        } catch (ocrErr) {
+            logger.error(`Processing failed for ${recordId}:`, ocrErr.message);
+            // Last resort: try to compress with sharp, otherwise store note
+            try {
+                const sharp = require('sharp');
+                const compressed = await sharp(file.buffer)
+                    .resize(600, null, { withoutEnlargement: true })
+                    .jpeg({ quality: 50 })
+                    .toBuffer();
+                extractedText = `VISION:image/jpeg:${compressed.toString('base64')}`;
+            } catch {
+                extractedText = '[Document processing failed. Please re-upload as an image (JPG/PNG).]';
+            }
+        }
+
+
+        // 3. Save to Database with extracted text
         const record = await prisma.recordCache.create({
             data: {
                 recordId,
@@ -84,19 +138,14 @@ router.post('/upload-document', requireRole('patient', 'doctor', 'admin'), uploa
                 hospitalId: req.user.orgId || 'HOSP-UPLOAD',
                 recordType: recordType || 'Patient Uploaded Document',
                 medicalCategory: ['General'],
-                dataHash: `HASH-${Date.now()}`, // Placeholder for browser-side hashing
+                dataHash: `HASH-${Date.now()}`,
                 ipfsCid,
+                extractedText,
                 recordedAt: new Date(),
             }
         });
 
-        // 3. Trigger AI Indexing in background (Don't wait for it to return to user)
-        aiService.processDocument(
-            file.buffer, 
-            file.mimetype, 
-            patientId, 
-            recordId
-        ).catch(err => logger.error('Background OCR failed:', err));
+        logger.info(`✅ Record ${recordId} saved with ${extractedText.length} chars of extracted text`);
 
         res.status(201).json({
             success: true,
@@ -107,6 +156,7 @@ router.post('/upload-document', requireRole('patient', 'doctor', 'admin'), uploa
         next(error);
     }
 });
+
 
 /**
  * GET /api/records/patient/:patientId

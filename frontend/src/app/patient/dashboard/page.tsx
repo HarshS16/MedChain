@@ -45,8 +45,9 @@ export default function PatientDashboard() {
     if (stored) {
       const parsedUser = JSON.parse(stored);
       setUser(parsedUser);
-      // Use the PAT-xxxx ID for stats
-      fetchDashboardData(parsedUser.patientId);
+      // Use patientId (PAT-xxxx) with fallback to id
+      const targetId = parsedUser.patientId || parsedUser.id;
+      if (targetId) fetchDashboardData(targetId);
     }
   }, []);
 

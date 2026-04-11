@@ -115,22 +115,37 @@ router.post('/query-history', requireRole('doctor', 'admin'), async (req, res, n
 });
 
 const aiServiceClient = require('../services/ai.service');
+const { prisma } = require('../config/db');
 
 /**
  * POST /api/ai/analyze-record
- * Get AI insights for a specific record
+ * Get AI insights for a specific medical record.
+ * Reads the extracted text from DB and sends it to OpenRouter.
  */
 router.post('/analyze-record', async (req, res, next) => {
     try {
-        const { recordId, recordType, ipfsCid, metadata } = req.body;
-        
-        const gateway = process.env.IPFS_GATEWAY_URL || 'https://gateway.pinata.cloud/ipfs';
-        const ipfsUrl = `${gateway}/${ipfsCid}`;
+        const { recordId } = req.body;
 
+        if (!recordId) {
+            return res.status(400).json({ error: 'Missing recordId' });
+        }
+
+        // Fetch the record with its extracted text from the database
+        const record = await prisma.recordCache.findUnique({
+            where: { recordId: recordId }
+        });
+
+        if (!record) {
+            return res.status(404).json({ error: 'Record not found', message: `Record ${recordId} does not exist.` });
+        }
+
+        const extractedText = record.extractedText || '';
+
+        // Send the actual text content to the AI for analysis
         const analysis = await aiServiceClient.analyzeRecord(
-            recordType,
-            ipfsUrl,
-            metadata || {}
+            record.recordType,
+            extractedText,
+            { medicalCategory: record.medicalCategory }
         );
 
         res.json({
@@ -141,7 +156,11 @@ router.post('/analyze-record', async (req, res, next) => {
             }
         });
     } catch (error) {
-        next(error);
+        logger.error('AI Analysis Route Error:', error.message);
+        res.status(500).json({
+            error: 'AI Analysis Failed',
+            message: error.message || 'Unknown error during AI analysis'
+        });
     }
 });
 

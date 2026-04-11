@@ -75,23 +75,23 @@ export default function MyRecordsPage() {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          recordId: record.recordId,
-          recordType: record.recordType,
-          ipfsCid: record.ipfsCid,
-          metadata: { medicalCategory: record.medicalCategory }
+          recordId: record.recordId
         })
       });
 
-      if (!response.ok) throw new Error("AI analysis failed");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || errorData.message || "AI analysis failed");
+      }
       
       const result = await response.json();
       setAnalyses(prev => ({
         ...prev,
         [record.recordId]: result.data.analysis
       }));
-    } catch (err) {
+    } catch (err: any) {
       console.error("AI Error:", err);
-      alert("AI analysis is currently unavailable. Check your backend logs or OpenRouter key.");
+      alert(`AI Error: ${err.message}`);
     } finally {
       setAnalyzingIds(prev => {
         const next = new Set(prev);
