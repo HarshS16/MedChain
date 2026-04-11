@@ -1,0 +1,180 @@
+// MedChain Prisma Schema
+// Hybrid Database mapping: PostgreSQL + pgvector support
+
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  extensions = [vector]
+}
+
+model Patient {
+  id                    String    @id @default(uuid()) @db.Uuid
+  patientId            String    @unique @map("patient_id")
+  abhaId               String?   @unique @map("abha_id")
+  publicKey            String?   @map("public_key")
+  demographicsEncrypted String?   @map("demographics_encrypted")
+  demographicsHash     String?   @map("demographics_hash")
+  registeredAt         DateTime  @default(now()) @map("registered_at")
+  updatedAt           DateTime  @default(now()) @updatedAt @map("updated_at")
+  isActive             Boolean   @default(true) @map("is_active")
+  
+  records              RecordCache[]
+  summary              PatientSummary?
+  
+  @@map("patients")
+}
+
+model Doctor {
+  id                    String    @id @default(uuid()) @db.Uuid
+  doctorId             String    @unique @map("doctor_id")
+  nmcRegistrationNo    String    @unique @map("nmc_registration_no")
+  orgId                String    @map("org_id")
+  specialization       String?
+  publicKey            String?   @map("public_key")
+  certificateFingerprint String? @map("certificate_fingerprint")
+  verifiedAt           DateTime? @map("verified_at")
+  isVerified           Boolean   @default(false) @map("is_verified")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@map("doctors")
+}
+
+model Hospital {
+  id                String    @id @default(uuid()) @db.Uuid
+  hospitalId        String    @unique @map("hospital_id")
+  name              String
+  registrationNo    String?   @map("registration_no")
+  fabricOrgMsp      String?   @map("fabric_org_msp")
+  address           String?
+  city              String?
+  state             String?
+  pincode           String?
+  accreditationStatus String? @map("accreditation_status")
+  isActive          Boolean   @default(true) @map("is_active")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@map("hospitals")
+}
+
+model RecordCache {
+  id              String    @id @default(uuid()) @db.Uuid
+  recordId        String    @unique @map("record_id")
+  patientId       String    @map("patient_id")
+  doctorId        String    @map("doctor_id")
+  hospitalId      String?   @map("hospital_id")
+  recordType      String    @map("record_type")
+  medicalCategory String[]  @map("medical_category")
+  dataHash        String    @map("data_hash")
+  ipfsCid         String    @map("ipfs_cid")
+  tags            String[]
+  blockchainTxId  String?   @map("blockchain_tx_id")
+  recordedAt      DateTime  @map("recorded_at")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  patient         Patient   @relation(fields: [patientId], references: [patientId])
+
+  @@index([patientId])
+  @@index([doctorId])
+  @@index([recordType])
+  @@index([recordedAt])
+  @@map("record_cache")
+}
+
+model Session {
+  id          String    @id @default(uuid()) @db.Uuid
+  userId      String    @map("user_id")
+  userType    String    @map("user_type")
+  tokenHash   String    @map("token_hash")
+  ipAddress   String?   @map("ip_address")
+  userAgent   String?   @map("user_agent")
+  expiresAt   DateTime  @map("expires_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  isRevoked   Boolean   @default(false) @map("is_revoked")
+
+  @@index([userId])
+  @@index([tokenHash])
+  @@map("sessions")
+}
+
+model AccessGrant {
+  id              String    @id @default(uuid()) @db.Uuid
+  patientId       String    @map("patient_id")
+  grantedTo       String    @map("granted_to")
+  grantedToType   String    @map("granted_to_type")
+  scope           String?   @default("ALL")
+  grantedAt       DateTime  @default(now()) @map("granted_at")
+  expiresAt       DateTime? @map("expires_at")
+  revokedAt       DateTime? @map("revoked_at")
+  isActive        Boolean   @default(true) @map("is_active")
+  blockchainTxId  String?   @map("blockchain_tx_id")
+
+  @@index([patientId])
+  @@index([grantedTo])
+  @@map("access_grants")
+}
+
+model AuditLog {
+  id              String    @id @default(uuid()) @db.Uuid
+  patientId       String    @map("patient_id")
+  accessorId      String    @map("accessor_id")
+  accessorType    String    @map("accessor_type")
+  action          String
+  recordId        String?   @map("record_id")
+  details         Json?
+  ipAddress       String?   @map("ip_address")
+  blockchainTxId  String?   @map("blockchain_tx_id")
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  @@index([patientId])
+  @@index([createdAt])
+  @@map("audit_log")
+}
+
+model RecordEmbedding {
+  id                String    @id @default(uuid()) @db.Uuid
+  recordId          String    @map("record_id")
+  patientId         String    @map("patient_id")
+  chunkIndex        Int       @map("chunk_index")
+  chunkText         String    @map("chunk_text")
+  embedding         Unsupported("vector(768)")?
+  recordType        String?   @map("record_type")
+  medicalCategory   String[]  @map("medical_category")
+  doctorId          String?   @map("doctor_id")
+  hospitalId        String?   @map("hospital_id")
+  recordedAt        DateTime? @map("recorded_at")
+  isCompressed      Boolean   @default(false) @map("is_compressed")
+  compressionLevel  Int       @default(0) @map("compression_level")
+  isAnchor          Boolean   @default(false) @map("is_anchor")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@index([patientId])
+  @@index([recordType])
+  @@map("record_embeddings")
+}
+
+model PatientSummary {
+  id                String    @id @default(uuid()) @db.Uuid
+  patientId         String    @unique @map("patient_id")
+  level0           String?   @map("level_0")
+  level1           Json?     @map("level_1")
+  level2           Json?     @map("level_2")
+  lastRecordId     String?   @map("last_record_id")
+  generatedAt      DateTime  @default(now()) @map("generated_at")
+  isStale          Boolean   @default(false) @map("is_stale")
+  modelUsed        String?   @map("model_used")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  patient           Patient   @relation(fields: [patientId], references: [patientId])
+
+  @@map("patient_summaries")
+}

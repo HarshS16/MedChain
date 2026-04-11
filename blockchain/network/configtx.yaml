@@ -1,0 +1,157 @@
+# Hyperledger Fabric Channel Configuration
+# Defines organizations, orderer, channel, and policies
+
+Organizations:
+  - &OrdererOrg
+    Name: OrdererOrg
+    ID: OrdererMSP
+    MSPDir: crypto-config/ordererOrganizations/orderer.medchain.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('OrdererMSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('OrdererMSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('OrdererMSP.admin')"
+
+  - &HospitalA
+    Name: HospitalAMSP
+    ID: HospitalAMSP
+    MSPDir: crypto-config/peerOrganizations/hospitala.medchain.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('HospitalAMSP.admin', 'HospitalAMSP.peer', 'HospitalAMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('HospitalAMSP.admin', 'HospitalAMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('HospitalAMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('HospitalAMSP.peer')"
+    AnchorPeers:
+      - Host: peer0.hospitala.medchain.com
+        Port: 7051
+
+  - &HospitalB
+    Name: HospitalBMSP
+    ID: HospitalBMSP
+    MSPDir: crypto-config/peerOrganizations/hospitalb.medchain.com/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('HospitalBMSP.admin', 'HospitalBMSP.peer', 'HospitalBMSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('HospitalBMSP.admin', 'HospitalBMSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('HospitalBMSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('HospitalBMSP.peer')"
+    AnchorPeers:
+      - Host: peer0.hospitalb.medchain.com
+        Port: 9051
+
+Capabilities:
+  Channel: &ChannelCapabilities
+    V2_0: true
+  Orderer: &OrdererCapabilities
+    V2_0: true
+  Application: &ApplicationCapabilities
+    V2_0: true
+
+Application: &ApplicationDefaults
+  Organizations:
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+    LifecycleEndorsement:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Endorsement"
+    Endorsement:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Endorsement"
+  Capabilities:
+    <<: *ApplicationCapabilities
+
+Orderer: &OrdererDefaults
+  OrdererType: etcdraft
+  Addresses:
+    - orderer.medchain.com:7050
+  EtcdRaft:
+    Consenters:
+      - Host: orderer.medchain.com
+        Port: 7050
+        ClientTLSCert: crypto-config/ordererOrganizations/orderer.medchain.com/orderers/orderer.medchain.com/tls/server.crt
+        ServerTLSCert: crypto-config/ordererOrganizations/orderer.medchain.com/orderers/orderer.medchain.com/tls/server.crt
+  BatchTimeout: 2s
+  BatchSize:
+    MaxMessageCount: 10
+    AbsoluteMaxBytes: 99 MB
+    PreferredMaxBytes: 512 KB
+  Organizations:
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+    BlockValidation:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+  Capabilities:
+    <<: *OrdererCapabilities
+
+Channel: &ChannelDefaults
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+  Capabilities:
+    <<: *ChannelCapabilities
+
+Profiles:
+  MedChainOrdererGenesis:
+    <<: *ChannelDefaults
+    Orderer:
+      <<: *OrdererDefaults
+      Organizations:
+        - *OrdererOrg
+    Consortiums:
+      MedChainConsortium:
+        Organizations:
+          - *HospitalA
+          - *HospitalB
+
+  MedChainChannel:
+    Consortium: MedChainConsortium
+    <<: *ChannelDefaults
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - *HospitalA
+        - *HospitalB

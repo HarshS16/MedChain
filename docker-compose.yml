@@ -1,0 +1,135 @@
+version: '3.8'
+
+services:
+  # ---- PostgreSQL with pgvector ----
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: medchain-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-medchain}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-medchain_password}
+      POSTGRES_DB: ${POSTGRES_DB:-medchain}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infrastructure/docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U medchain"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - medchain-net
+
+  # ---- Redis (Session & Cache) ----
+  redis:
+    image: redis:7-alpine
+    container_name: medchain-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - medchain-net
+
+  # ---- IPFS (Private Node) ----
+  ipfs:
+    image: ipfs/kubo:latest
+    container_name: medchain-ipfs
+    environment:
+      - IPFS_PROFILE=server
+    ports:
+      - "4001:4001"   # Swarm
+      - "5001:5001"   # API
+      - "8080:8080"   # Gateway
+    volumes:
+      - ipfs_data:/data/ipfs
+      - ipfs_staging:/export
+    networks:
+      - medchain-net
+
+  # ---- Backend API ----
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: medchain-backend
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - DATABASE_URL=postgresql://medchain:medchain_password@postgres:5432/medchain
+      - REDIS_URL=redis://redis:6379
+      - IPFS_API_URL=http://ipfs:5001
+      - IPFS_GATEWAY_URL=http://ipfs:8080
+      - AI_SERVICE_URL=http://ai:8000
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      ipfs:
+        condition: service_started
+    volumes:
+      - ./backend/src:/app/src
+      - /app/node_modules
+    networks:
+      - medchain-net
+
+  # ---- AI Service ----
+  ai:
+    build:
+      context: ./ai
+      dockerfile: Dockerfile
+    container_name: medchain-ai
+    environment:
+      - DATABASE_URL=postgresql://medchain:medchain_password@postgres:5432/medchain
+      - ZHIPU_API_KEY=${ZHIPU_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - LLM_PROVIDER=${LLM_PROVIDER:-gemini}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./ai/src:/app/src
+    networks:
+      - medchain-net
+
+  # ---- Frontend ----
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: medchain-frontend
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:3001
+      - NEXT_PUBLIC_AI_URL=http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend/src:/app/src
+      - /app/node_modules
+      - /app/.next
+    networks:
+      - medchain-net
+
+volumes:
+  postgres_data:
+  redis_data:
+  ipfs_data:
+  ipfs_staging:
+
+networks:
+  medchain-net:
+    driver: bridge
