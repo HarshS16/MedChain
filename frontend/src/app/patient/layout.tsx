@@ -24,6 +24,7 @@ import { useRouter, usePathname } from "next/navigation";
 
 const sidebarLinks = [
   { href: "/patient/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+  { href: "/patient/history", icon: Activity, label: "Medical History" },
   { href: "/patient/records", icon: FileText, label: "My Records" },
   { href: "/patient/access", icon: Lock, label: "Access Control" },
   { href: "/patient/audit", icon: History, label: "Audit Logs" },
@@ -122,26 +123,28 @@ export default function PatientLayout({
 
         {/* User section */}
         <div className="p-4 border-t border-white/[0.06] flex flex-col items-center">
-          <div className={`flex items-center w-full gap-3 py-3 rounded-xl ${isCollapsed ? "bg-transparent justify-center px-0" : "bg-white/[0.03] px-4"}`}>
-            <div className="w-10 h-10 shrink-0 rounded-full bg-gradient-to-br from-indigo-500 to-teal-500 flex items-center justify-center text-white font-semibold text-sm" title={user.name}>
-              {user.name?.charAt(0) || "P"}
-            </div>
-            {!isCollapsed && (
-              <>
+          <div className={`flex items-center w-full gap-3 py-3 rounded-xl ${isCollapsed ? "bg-transparent justify-center px-0" : "bg-white/[0.03] px-4 hover:bg-white/[0.05] transition-colors"}`}>
+            <Link href="/patient/profile" className="flex items-center gap-3 flex-1 min-w-0">
+              <div className="w-10 h-10 shrink-0 rounded-full bg-gradient-to-br from-indigo-500 to-teal-500 flex items-center justify-center text-white font-semibold text-sm" title={user.name}>
+                {user.name?.charAt(0) || "P"}
+              </div>
+              {!isCollapsed && (
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">{user.name}</p>
+                  <p className="text-sm font-medium truncate hover:text-indigo-400 transition-colors">{user.name}</p>
                   <p className="text-xs text-gray-500 truncate">
                     ABHA: {user.abhaId}
                   </p>
                 </div>
-                <button
-                  onClick={handleLogout}
-                  className="text-gray-500 hover:text-red-400 transition-colors"
-                  title="Logout"
+              )}
+            </Link>
+            {!isCollapsed && (
+              <button
+                onClick={handleLogout}
+                className="text-gray-500 hover:text-red-400 transition-colors"
+                title="Logout"
                 >
                   <LogOut className="w-4 h-4 shrink-0" />
                 </button>
-              </>
             )}
           </div>
           {isCollapsed && (
