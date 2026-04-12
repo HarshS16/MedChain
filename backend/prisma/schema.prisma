@@ -16,6 +16,12 @@ model Patient {
   id                    String    @id @default(uuid()) @db.Uuid
   patientId            String    @unique @map("patient_id")
   abhaId               String?   @unique @map("abha_id")
+  name                 String?
+  email                String?   @unique
+  phone                String?
+  passwordHash         String?   @map("password_hash")
+  dateOfBirth          DateTime? @map("date_of_birth")
+  gender               String?
   publicKey            String?   @map("public_key")
   demographicsEncrypted String?   @map("demographics_encrypted")
   demographicsHash     String?   @map("demographics_hash")
@@ -33,6 +39,10 @@ model Doctor {
   id                    String    @id @default(uuid()) @db.Uuid
   doctorId             String    @unique @map("doctor_id")
   nmcRegistrationNo    String    @unique @map("nmc_registration_no")
+  name                 String?
+  email                String?   @unique
+  phone                String?
+  passwordHash         String?   @map("password_hash")
   orgId                String    @map("org_id")
   specialization       String?
   publicKey            String?   @map("public_key")
