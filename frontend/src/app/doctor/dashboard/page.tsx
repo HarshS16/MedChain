@@ -108,7 +108,7 @@ export default function DoctorDashboard() {
     >
       {/* ---- Welcome Banner ---- */}
       <motion.div
-        variants={fadeInUp}
+        variants={fadeInUp as any}
         className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-600/20 to-teal-600/10 border border-indigo-500/20 p-8"
       >
         <div className="absolute inset-0 dot-pattern opacity-10" />
@@ -138,7 +138,7 @@ export default function DoctorDashboard() {
         {statsData.map((stat, i) => (
           <motion.div
             key={stat.label}
-            variants={fadeInUp}
+            variants={fadeInUp as any}
             custom={i}
             className="p-6 rounded-2xl border border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12] hover:bg-white/[0.04] transition-all group cursor-default"
           >
@@ -157,7 +157,7 @@ export default function DoctorDashboard() {
       </div>
 
       {/* ---- Quick Actions ---- */}
-      <motion.div variants={fadeInUp} custom={5}>
+      <motion.div variants={fadeInUp as any} custom={5}>
         <h3 className="text-lg font-semibold mb-4">Quick Actions</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {quickActions.map((action, i) => (
@@ -179,7 +179,7 @@ export default function DoctorDashboard() {
         </div>
       </motion.div>
 
-      <motion.div variants={fadeInUp} custom={6}>
+      <motion.div variants={fadeInUp as any} custom={6}>
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold">Recent Patients</h3>
           <Link href="/doctor/patient/search" className="text-xs text-indigo-400 hover:text-indigo-300 font-medium">View All</Link>
@@ -216,7 +216,7 @@ export default function DoctorDashboard() {
       </motion.div>
 
       {/* ---- System Status ---- */}
-      <motion.div variants={fadeInUp} custom={7}>
+      <motion.div variants={fadeInUp as any} custom={7}>
         <div className="flex items-center gap-4 p-4 rounded-2xl border border-white/[0.06] bg-white/[0.02]">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />

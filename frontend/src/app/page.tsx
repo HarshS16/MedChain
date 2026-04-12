@@ -216,7 +216,7 @@ export default function HomePage() {
           >
             {/* Badge */}
             <motion.div
-              variants={fadeInUp}
+              variants={fadeInUp as any}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-8 text-sm"
             >
               <Sparkles className="w-4 h-4 text-indigo-400" />
@@ -227,7 +227,7 @@ export default function HomePage() {
 
             {/* Heading */}
             <motion.h1
-              variants={fadeInUp}
+              variants={fadeInUp as any}
               custom={1}
               className="text-5xl md:text-7xl lg:text-8xl font-bold leading-[1.05] tracking-tight mb-6"
             >
@@ -238,7 +238,7 @@ export default function HomePage() {
 
             {/* Subtitle */}
             <motion.p
-              variants={fadeInUp}
+              variants={fadeInUp as any}
               custom={2}
               className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-10 leading-relaxed"
             >
@@ -249,7 +249,7 @@ export default function HomePage() {
 
             {/* CTA Buttons */}
             <motion.div
-              variants={fadeInUp}
+              variants={fadeInUp as any}
               custom={3}
               className="flex flex-col sm:flex-row items-center justify-center gap-4"
             >
@@ -271,7 +271,7 @@ export default function HomePage() {
 
             {/* Stats Bar */}
             <motion.div
-              variants={fadeInUp}
+              variants={fadeInUp as any}
               custom={4}
               className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto"
             >
@@ -317,13 +317,13 @@ export default function HomePage() {
             className="text-center mb-20"
           >
             <motion.p
-              variants={fadeInUp}
+              variants={fadeInUp as any}
               className="text-sm text-indigo-400 uppercase tracking-widest mb-3"
             >
               The Problem
             </motion.p>
             <motion.h2
-              variants={fadeInUp}
+              variants={fadeInUp as any}
               custom={1}
               className="text-4xl md:text-5xl font-bold mb-6"
             >
@@ -332,7 +332,7 @@ export default function HomePage() {
               <span className="text-gray-500">Are Broken</span>
             </motion.h2>
             <motion.p
-              variants={fadeInUp}
+              variants={fadeInUp as any}
               custom={2}
               className="text-gray-400 text-lg max-w-xl mx-auto"
             >
@@ -377,7 +377,7 @@ export default function HomePage() {
             ].map((item, i) => (
               <motion.div
                 key={item.title}
-                variants={fadeInUp}
+                variants={fadeInUp as any}
                 custom={i}
                 className="p-6 rounded-2xl bg-white/[0.03] border border-white/[0.06] hover:border-red-500/30 hover:bg-red-500/[0.03] transition-all duration-300"
               >
@@ -402,13 +402,13 @@ export default function HomePage() {
             className="text-center mb-20"
           >
             <motion.p
-              variants={fadeInUp}
+              variants={fadeInUp as any}
               className="text-sm text-teal-400 uppercase tracking-widest mb-3"
             >
               The Solution
             </motion.p>
             <motion.h2
-              variants={fadeInUp}
+              variants={fadeInUp as any}
               custom={1}
               className="text-4xl md:text-5xl font-bold mb-6"
             >
@@ -428,7 +428,7 @@ export default function HomePage() {
             {features.map((feature, i) => (
               <motion.div
                 key={feature.title}
-                variants={fadeInUp}
+                variants={fadeInUp as any}
                 custom={i}
                 onMouseEnter={() => setActiveFeature(i)}
                 className={`group relative p-8 rounded-3xl border transition-all duration-500 cursor-pointer ${
@@ -481,13 +481,13 @@ export default function HomePage() {
             className="text-center mb-20"
           >
             <motion.p
-              variants={fadeInUp}
+              variants={fadeInUp as any}
               className="text-sm text-indigo-400 uppercase tracking-widest mb-3"
             >
               Architecture
             </motion.p>
             <motion.h2
-              variants={fadeInUp}
+              variants={fadeInUp as any}
               custom={1}
               className="text-4xl md:text-5xl font-bold mb-6"
             >
@@ -543,7 +543,7 @@ export default function HomePage() {
             ].map((item, i) => (
               <motion.div
                 key={item.layer}
-                variants={fadeInUp}
+                variants={fadeInUp as any}
                 custom={i}
                 className="group flex items-start gap-6 p-6 md:p-8 rounded-2xl border border-white/[0.06] bg-white/[0.02] hover:border-white/[0.12] hover:bg-white/[0.04] transition-all duration-300"
               >
@@ -579,7 +579,7 @@ export default function HomePage() {
             viewport={{ once: true, margin: "-100px" }}
             variants={staggerContainer}
           >
-            <motion.div variants={fadeInUp} className="text-center mb-16">
+            <motion.div variants={fadeInUp as any} className="text-center mb-16">
               <p className="text-sm text-amber-400 uppercase tracking-widest mb-3">
                 AI in Action
               </p>
@@ -591,7 +591,7 @@ export default function HomePage() {
             </motion.div>
 
             <motion.div
-              variants={fadeInUp}
+              variants={fadeInUp as any}
               custom={2}
               className="max-w-3xl mx-auto"
             >
@@ -669,13 +669,13 @@ export default function HomePage() {
             className="text-center mb-16"
           >
             <motion.p
-              variants={fadeInUp}
+              variants={fadeInUp as any}
               className="text-sm text-teal-400 uppercase tracking-widest mb-3"
             >
               Technology
             </motion.p>
             <motion.h2
-              variants={fadeInUp}
+              variants={fadeInUp as any}
               custom={1}
               className="text-4xl md:text-5xl font-bold"
             >
@@ -715,7 +715,7 @@ export default function HomePage() {
             variants={staggerContainer}
           >
             <motion.h2
-              variants={fadeInUp}
+              variants={fadeInUp as any}
               className="text-4xl md:text-6xl font-bold mb-6"
             >
               Ready to Transform
@@ -723,7 +723,7 @@ export default function HomePage() {
               <span className="gradient-text">Indian Healthcare?</span>
             </motion.h2>
             <motion.p
-              variants={fadeInUp}
+              variants={fadeInUp as any}
               custom={1}
               className="text-gray-400 text-lg mb-10 max-w-xl mx-auto"
             >
@@ -731,7 +731,7 @@ export default function HomePage() {
               Every doctor informed.
             </motion.p>
             <motion.div
-              variants={fadeInUp}
+              variants={fadeInUp as any}
               custom={2}
               className="flex flex-col sm:flex-row items-center justify-center gap-4"
             >
