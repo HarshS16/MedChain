@@ -120,7 +120,7 @@ export default function PatientDashboard() {
       >
         {/* ---- Welcome Banner ---- */}
         <motion.div
-          variants={fadeInUp}
+          variants={fadeInUp as any}
           className="relative overflow-hidden rounded-[2.5rem] bg-indigo-50/50 border border-indigo-100 p-10 lg:p-12"
         >
           {/* Subtle grid background */}
@@ -191,7 +191,7 @@ export default function PatientDashboard() {
           ].map((stat, i) => (
             <motion.div
               key={stat.label}
-              variants={fadeInUp}
+              variants={fadeInUp as any}
               custom={i}
               className="p-8 rounded-[2.5rem] bg-white/60 backdrop-blur-2xl border border-slate-100 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] hover:-translate-y-2 transition-all duration-500 relative group overflow-hidden"
             >
@@ -226,7 +226,7 @@ export default function PatientDashboard() {
         {/* ---- Bottom Row: Security & Quick Actions ---- */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
           {/* Privacy & Security (Premium White Card) */}
-          <motion.div variants={fadeInUp} custom={3} className="h-full">
+          <motion.div variants={fadeInUp as any} custom={3} className="h-full">
             <div className="h-full rounded-[2.5rem] border border-slate-100 bg-white/60 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 lg:p-10 flex flex-col">
               <div className="flex items-center justify-between mb-8">
                 <div>
@@ -263,7 +263,7 @@ export default function PatientDashboard() {
           {/* Quick Actions (Vibrant Interactive Cards) */}
           <div className="space-y-6 lg:space-y-8">
             <motion.div
-              variants={fadeInUp}
+              variants={fadeInUp as any}
               custom={4}
               onClick={() => setShowEmergencyModal(true)}
               className="p-8 lg:p-10 rounded-[2.5rem] border border-slate-100 bg-white/60 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-2xl hover:shadow-red-500/10 hover:border-red-200 transition-all duration-500 group cursor-pointer relative overflow-hidden"
@@ -293,7 +293,7 @@ export default function PatientDashboard() {
             </motion.div>
 
             <motion.div
-              variants={fadeInUp}
+              variants={fadeInUp as any}
               custom={5}
               onClick={() => {
                 window.open("https://phr.abdm.gov.in/register", "_blank");
