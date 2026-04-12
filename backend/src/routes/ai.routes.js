@@ -139,14 +139,32 @@ router.post('/analyze-record', async (req, res, next) => {
             return res.status(404).json({ error: 'Record not found', message: `Record ${recordId} does not exist.` });
         }
 
+        // Return cached analysis if it exists
+        if (record.aiAnalysis) {
+            logger.info('Returning cached AI analysis for record: ' + recordId);
+            return res.json({
+                success: true,
+                data: {
+                    recordId,
+                    analysis: record.aiAnalysis
+                }
+            });
+        }
+
         const extractedText = record.extractedText || '';
 
-        // Send the actual text content to the AI for analysis
+        // Generate new AI Analysis
         const analysis = await aiServiceClient.analyzeRecord(
             record.recordType,
             extractedText,
             { medicalCategory: record.medicalCategory }
         );
+
+        // Save analysis to normal PostgeSQL Database
+        await prisma.recordCache.update({
+            where: { recordId: recordId },
+            data: { aiAnalysis: analysis }
+        });
 
         res.json({
             success: true,

@@ -60,6 +60,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: medchain-backend
+    command: npm run dev
     environment:
       - NODE_ENV=development
       - PORT=3001

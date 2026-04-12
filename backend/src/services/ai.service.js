@@ -15,10 +15,29 @@ class AIServiceClient {
     }
 
     /**
-     * ALWAYS return the hardcoded demo analysis (bypassing AI completely)
+     * Analyze a medical record using OpenRouter
      */
     async analyzeRecord(recordType, extractedText, metadata = {}) {
-        return this._demoAnalysis(recordType);
+        const hasOpenRouter = this.openRouterKey && this.openRouterKey !== 'your_openrouter_key_here';
+
+        if (!hasOpenRouter) {
+            logger.warn('OpenRouter API key missing. Returning demo analysis.');
+            return this._demoAnalysis(recordType);
+        }
+
+        if (!extractedText || extractedText.trim().length < 10) {
+            logger.warn('No content extracted from document. Returning demo analysis.');
+            return this._demoAnalysis(recordType);
+        }
+
+        try {
+            logger.info('Calling OpenRouter for analysis...');
+            return await this._callOpenRouter(recordType, extractedText, metadata);
+        } catch (err) {
+            logger.error('OpenRouter failed: ' + err.message);
+            logger.warn('Returning demo analysis as fallback.');
+            return this._demoAnalysis(recordType);
+        }
     }
 
     /**

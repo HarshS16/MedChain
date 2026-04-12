@@ -74,6 +74,7 @@ model RecordCache {
   dataHash        String    @map("data_hash")
   ipfsCid         String    @map("ipfs_cid")
   extractedText   String?   @map("extracted_text")
+  aiAnalysis      String?   @map("ai_analysis")
   tags            String[]
   blockchainTxId  String?   @map("blockchain_tx_id")
   recordedAt      DateTime  @map("recorded_at")

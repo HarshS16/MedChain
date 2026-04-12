@@ -3,8 +3,8 @@ const { PrismaClient } = require('@prisma/client');
 const p = new PrismaClient();
 
 async function main() {
-    await p.$executeRawUnsafe('ALTER TABLE record_cache ADD COLUMN IF NOT EXISTS extracted_text TEXT');
-    console.log('✅ extracted_text column added successfully');
+    await p.$executeRawUnsafe('ALTER TABLE record_cache ADD COLUMN IF NOT EXISTS ai_analysis TEXT');
+    console.log('✅ ai_analysis column added successfully');
     await p.$disconnect();
 }
 

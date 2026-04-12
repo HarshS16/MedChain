@@ -15,6 +15,7 @@ const recordRoutes = require('./routes/record.routes');
 const accessRoutes = require('./routes/access.routes');
 const aiRoutes = require('./routes/ai.routes');
 const adminRoutes = require('./routes/admin.routes');
+const chatRoutes = require('./routes/chat.routes');
 const { errorHandler, notFoundHandler } = require('./middleware/error.middleware');
 const fabricGateway = require('./config/fabric-gateway');
 const { connectDb, disconnectDb } = require('./config/db');
@@ -86,6 +87,8 @@ app.get('/health', (req, res) => {
 });
 
 // API Routes
+app.get('/api/test-chat', (req, res) => res.json({ status: 'ok' }));
+app.use('/api/chat', chatRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/records', recordRoutes);
 app.use('/api/access', accessRoutes);
