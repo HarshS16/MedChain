@@ -221,7 +221,7 @@ export default function PatientLayout({
                 Patient Portal
               </h1>{" "}
               <p className="text-[13px] text-slate-500 font-medium">
-                Welcome, {user.name?.split("")[0]}
+                Welcome
               </p>{" "}
             </div>{" "}
           </div>{" "}
