@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 import {
   Heart,
   Stethoscope,
@@ -24,7 +24,7 @@ import { useRouter } from "next/navigation";
 
 type AuthMode = "login" | "register-patient" | "register-doctor";
 
-const fadeIn = {
+const fadeIn: Variants = {
   hidden: { opacity: 0, y: 30 },
   visible: {
     opacity: 1,
