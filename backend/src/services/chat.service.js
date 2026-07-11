@@ -92,13 +92,11 @@ Current conversation history follows. Answer the user's latest message based on 
             { role: 'user', content: userMessage }
         ];
 
-        // List of free models to try in case of rate limits (429) or unavailability (404)
         const models = [
-            'google/gemma-3-4b-it:free',
-            'meta-llama/llama-3.3-70b-instruct:free',
-            'mistralai/mistral-7b-instruct:free',
-            'microsoft/phi-3-medium-128k-instruct:free',
-            'huggingfaceh4/zephyr-7b-beta:free'
+            'google/gemma-4-31b-it:free',
+            'nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free',
+            'poolside/laguna-xs-2.1:free',
+            'tencent/hy3:free'
         ];
 
         let lastError = null;
@@ -135,7 +133,7 @@ Current conversation history follows. Answer the user's latest message based on 
                 
                 logger.warn(`Model ${model} failed (Status ${statusCode}): ${errorMsg}`);
                 
-                if (statusCode === 429 || statusCode === 404) {
+                if (statusCode === 429 || statusCode === 404 || statusCode === 400 || statusCode === 502) {
                     logger.info(`Switching to fallback model due to status ${statusCode} on ${model}...`);
                     continue; // Try next model
                 }

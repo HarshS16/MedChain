@@ -11,10 +11,10 @@ from datetime import datetime
 import os
 import logging
 
-from .services.embedding_service import embedding_service
-from .services.vector_service import vector_service
-from .services.rag_service import rag_service
-from .services.ocr_service import ocr_service
+from src.services.embedding_service import embedding_service
+from src.services.vector_service import vector_service
+from src.services.rag_service import rag_service
+from src.services.ocr_service import ocr_service
 from fastapi import File, UploadFile, Form
 
 # Configure logging
