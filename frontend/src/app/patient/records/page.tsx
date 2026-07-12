@@ -43,7 +43,7 @@ export default function MyRecordsPage() {
       const user = JSON.parse(userStr);
       const targetId = user.patientId || user.id;
       
-      const response = await fetch(`http://localhost:3001/api/records/patient/${targetId}`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/records/patient/${targetId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -68,7 +68,7 @@ export default function MyRecordsPage() {
       setAnalyzingIds(prev => new Set(prev).add(record.recordId));
       const token = localStorage.getItem("medchain_token");
 
-      const response = await fetch("http://localhost:3001/api/ai/analyze-record", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/ai/analyze-record`, {
         method: "POST",
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -128,7 +128,7 @@ export default function MyRecordsPage() {
       formData.append("patientId", targetId);
       formData.append("recordType", "Patient Uploaded Document");
 
-      const response = await fetch("http://localhost:3001/api/records/upload-document", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/records/upload-document`, {
         method: "POST",
         headers: {
           'Authorization': `Bearer ${token}`
