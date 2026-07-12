@@ -109,28 +109,28 @@ export default function DoctorDashboard() {
           {[
             {
               label: "Active Patients",
-              value: "0",
+              value: "142",
               icon: Users,
               color: "from-[#4F46E5] to-[#7C3AED]",
               glow: "shadow-indigo-500/30",
             },
             {
               label: "Records Created",
-              value: "0",
+              value: "856",
               icon: FileText,
               color: "from-[#10B981] to-[#059669]",
               glow: "shadow-emerald-500/30",
             },
             {
               label: "AI Queries",
-              value: "0",
+              value: "24",
               icon: Brain,
               color: "from-[#F59E0B] to-[#EF4444]",
               glow: "shadow-orange-500/30",
             },
             {
               label: "Access Grants",
-              value: "0",
+              value: "38",
               icon: Shield,
               color: "from-[#8B5CF6] to-[#D946EF]",
               glow: "shadow-purple-500/30",
@@ -191,6 +191,9 @@ export default function DoctorDashboard() {
                 {[
                   { id: "PAT-a3f9e2b1-4c67", name: "Rajesh Kumar", abhaId: "12-3456-7890-1234", lastVisit: "2 hours ago", status: "Follow-up", color: "text-indigo-600" },
                   { id: "PAT-b7e2d1a3-9f88", name: "Suman Singh", abhaId: "99-1234-5678-0000", lastVisit: "Yesterday", status: "New Case", color: "text-emerald-600" },
+                  { id: "PAT-c9x8y7z6-5a4b", name: "Anita Sharma", abhaId: "45-6789-0123-4567", lastVisit: "2 days ago", status: "Review", color: "text-amber-600" },
+                  { id: "PAT-d1w2v3u4-t5s6", name: "Vikram Malhotra", abhaId: "88-9012-3456-7890", lastVisit: "3 days ago", status: "Consultation", color: "text-blue-600" },
+                  { id: "PAT-e9f8g7h6-i5j4", name: "Priya Desai", abhaId: "23-4567-8901-2345", lastVisit: "Last week", status: "Lab Reports", color: "text-purple-600" },
                 ].map((patient) => (
                   <Link
                     key={patient.id}
